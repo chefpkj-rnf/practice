@@ -18,8 +18,13 @@ body{
     padding: 0;
 }   
 
-
-
+.mainBODY{
+    display: flex;
+    flex-direction:column;
+    align-items: start;
+    background-color:blue;
+    margin-inline: 25px;
+}
 
 
 .footer{
