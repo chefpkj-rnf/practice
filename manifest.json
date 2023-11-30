@@ -1,0 +1,21 @@
+{
+    "name":"Pulse",
+    "description":"Unlock the Beat of Efficiency with 'TeamJs's Pulse' – The Ultimate Time Management Companion. Harness the Power of 'Keka' to Seamlessly Track and Optimize Office Hours, Turning Work into a Symphony of Productivity. Stay In Control, Stay in the Pulse!",
+    "version":"1.0",
+    "manifest_version":3,
+    "background":{
+        "service_worker":"background.js"
+    },
+    "action":{
+        "default_popup":"popup.html"
+    },
+    "icons":{
+        "16":"/images/picker_16.png",
+        "32":"/images/picker_32.png",
+        "48":"/images/picker_48.png"
+    },
+    "permissions":[
+        "activeTab",
+        "scripting"
+    ]
+}
