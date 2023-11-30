@@ -182,18 +182,19 @@ const pkj = async () => {
       const {totalMilliseconds,totalTime,shouldStopTime,shouldRegularize,regularizationAddOn}=CalculateTotalTimeFromSlotArray(injectionResult[0].result) || -1;
       console.log("pkj function: ",totalTime);
       let totalSeconds=totalMilliseconds/1000;
-
-      
-
-      timeShow.innerText = totalTime;
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        const updatedTimeString = `<span style="font-size: medium;font-weight: 600; "><span style="font-size: xx-large; font-weight: 500;">${hours}</span><span style="margin-inline: 1px;">h</span><span style="margin-inline: 7px"><span style="font-size: xx-large; font-weight: 500;">${minutes}</span><span style="margin-inline: 1px;">m</span></span><span style="font-size: xx-large; font-weight: 500;">${seconds}</span><span style="margin-inline: 1px;">s</span></span>`;
+        timeShow.innerHTML = updatedTimeString;
       // // Create a function to update the timer every second
       function updateTimer() {
         totalSeconds++; // Increment the totalSeconds
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
-        const updatedTimeString = `${hours}:${minutes}:${seconds}`;
-        timeShow.innerText = updatedTimeString;
+        const updatedTimeString = `<span style="font-size: medium;font-weight: 600; "><span style="font-size: xx-large; font-weight: 500;">${hours}</span><span style="margin-inline: 1px;">h</span><span style="margin-inline: 7px"><span style="font-size: xx-large; font-weight: 500;">${minutes}</span><span style="margin-inline: 1px;">m</span></span><span style="font-size: xx-large; font-weight: 500;">${seconds}</span><span style="margin-inline: 1px;">s</span></span>`;
+        timeShow.innerHTML = updatedTimeString;
         console.log("timer update kr rha hun!!")
       }
     
@@ -202,7 +203,7 @@ const pkj = async () => {
         const timerInterval = setInterval(updateTimer, 1000);
       }
       else{
-        DayStatus.innerHTML="<strong>Ta-da!</strong> Workday finished!! &#128640; &#129321;"
+        DayStatus.innerHTML="<strong>Ta-da!</strong> Workday finished!! &#128640; &#129321; &#128131;"
       }
       
       // console.log(`total calc time last last: ${timeString}`);
