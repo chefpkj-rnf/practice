@@ -115,6 +115,29 @@ function calculateTotalTime(timeSlots) {
   
 }
 
+const calculateWrapUP=(secondsCompleted)=>{
+  if(secondsCompleted>28800){
+    return -108;
+  }
+
+  try{
+    const totalSecondsIn8Hours = 8 * 60 * 60;
+    const now = new Date();
+ 
+   // Calculate seconds left
+   const secondsLeft = totalSecondsIn8Hours - secondsCompleted;
+   const completionTime = new Date(now.getTime() + secondsLeft * 1000);
+ 
+   return completionTime.toLocaleTimeString(); // Format the time
+  }
+  catch(err){
+    console.log("error in calculateWrapUP function",err);
+  }
+  
+   
+
+}
+
 const CalculateTotalTimeFromSlotArray=(timeSlots)=>{
   //lets first change every item to 24hours time format;
   const convertedTimeSlots=convertTo24HoursFormat(timeSlots);
@@ -176,39 +199,61 @@ const pkj = async () => {
       target: { tabId: tab?.id },
       function: pkjFunctionWrapper(extractFromWebPage),  
     },
+
+
+
+
+
+
     async (injectionResult) => {
       //your timeSlots=injectionResult[0].result
       //now here my timeSlot is ready now i am calculating the total time from each slots 
       const {totalMilliseconds,totalTime,shouldStopTime,shouldRegularize,regularizationAddOn}=CalculateTotalTimeFromSlotArray(injectionResult[0].result) || -1;
-      console.log("pkj function: ",totalTime);
+      console.log("totalMilliseconds,totalTime,shouldStopTime,shouldRegularize,regularizationAddOn",totalMilliseconds,totalTime,shouldStopTime,shouldRegularize,regularizationAddOn);
       let totalSeconds=totalMilliseconds/1000;
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-        const updatedTimeString = `<span style="font-size: medium;font-weight: 600; "><span style="font-size: xx-large; font-weight: 500;">${hours}</span><span style="margin-inline: 1px;">h</span><span style="margin-inline: 7px"><span style="font-size: xx-large; font-weight: 500;">${minutes}</span><span style="margin-inline: 1px;">m</span></span><span style="font-size: xx-large; font-weight: 500;">${seconds}</span><span style="margin-inline: 1px;">s</span></span>`;
+        const hourss = Math.floor(totalSeconds / 3600);
+        const minutess = Math.floor((totalSeconds % 3600) / 60);
+        const secondss = totalSeconds % 60;
+        const updatedTimeString = `<span style="font-size: medium;font-weight: 600; "><span style="font-size: xx-large; font-weight: 500;">${hourss}</span><span style="margin-inline: 1px;">h</span><span style="margin-inline: 7px"><span style="font-size: xx-large; font-weight: 500;">${minutess<10?'0'+minutess:minutess}</span><span style="margin-inline: 1px;">m</span></span><span style="font-size: xx-large; font-weight: 500;">${secondss<10?'0'+secondss:secondss}</span><span style="margin-inline: 1px;">s</span></span>`;
         timeShow.innerHTML = updatedTimeString;
+       
       // // Create a function to update the timer every second
       function updateTimer() {
         totalSeconds++; // Increment the totalSeconds
         const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-        const updatedTimeString = `<span style="font-size: medium;font-weight: 600; "><span style="font-size: xx-large; font-weight: 500;">${hours}</span><span style="margin-inline: 1px;">h</span><span style="margin-inline: 7px"><span style="font-size: xx-large; font-weight: 500;">${minutes}</span><span style="margin-inline: 1px;">m</span></span><span style="font-size: xx-large; font-weight: 500;">${seconds}</span><span style="margin-inline: 1px;">s</span></span>`;
+        let minutes = Math.floor((totalSeconds % 3600) / 60);
+        let seconds = totalSeconds % 60;
+        const updatedTimeString = `<span style="font-size: medium;font-weight: 600; "><span style="font-size: xx-large; font-weight: 500;">${hours}</span><span style="margin-inline: 1px;">h</span><span style="margin-inline: 7px"><span style="font-size: xx-large; font-weight: 500;">${minutes<10?'0'+minutes:minutes}</span><span style="margin-inline: 1px;">m</span></span><span style="font-size: xx-large; font-weight: 500;">${seconds<10?'0'+seconds:seconds}</span><span style="margin-inline: 1px;">s</span></span>`;
         timeShow.innerHTML = updatedTimeString;
         console.log("timer update kr rha hun!!")
       }
     
       // Call the updateTimer function every second
       if(!shouldStopTime){
+        const wrapUpTime=calculateWrapUP(totalSeconds)
+        DayStatus.innerHTML=`Wrapping up at <strong>${wrapUpTime}!</strong>&#128171;`
         const timerInterval = setInterval(updateTimer, 1000);
+
       }
       else{
         DayStatus.innerHTML="<strong>Ta-da!</strong> Workday finished!! &#128640; &#129321; &#128131;"
       }
       
-      // console.log(`total calc time last last: ${timeString}`);
     }
     
+
+
+
+
+
+
+
+
+
+
+
+
+
     );
   } catch (err) {
     console.error(err);
