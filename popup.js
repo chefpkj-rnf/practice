@@ -1,5 +1,6 @@
 const timeShow = document.querySelector("#timeShow");
 const DayStatus = document.querySelector("#DayStatus");
+const totalTimeVal = document.querySelector("#totalTimeVal");
 
 function convertTo24HoursFormat(timeSlots) {
   const convertedTimeSlots = [];
@@ -47,14 +48,17 @@ function calculateTotalTime(timeSlots) {
     let shouldRegularize=0;
     let totalMilliseconds = 0;
     let regularizationAddOn=0;
+    let OfficetotalSeconds=0;
 
     for(let i = 0; i < timeSlots.length; i++){
+      
+      
       let slot=timeSlots[i];
       const [entryTime, exitTime] = slot;
       // Parse time strings into Date objects
       let entryDate = new Date(`2000-01-01T${entryTime}`);
       let exitDate = new Date(`2000-01-01T${exitTime}`);
-      // Check if the Date objects are valid
+      // Check if the Date objects are invalid
       if (isNaN(entryDate) || isNaN(exitDate)) {
   
         if(i===(timeSlots.length-1) && isNaN(exitDate)){
@@ -81,9 +85,16 @@ function calculateTotalTime(timeSlots) {
   
       // Calculate time difference in milliseconds
       const timeDiffInMillis = exitDate - entryDate;
-  
+
+      
+      
       // Accumulate the time differences
       totalMilliseconds += timeDiffInMillis;
+
+      console.log("exitData:",exitDate,", entryData:",entryDate,", Millisec:",totalMilliseconds)
+
+      
+      
     };
   
   
@@ -92,16 +103,32 @@ function calculateTotalTime(timeSlots) {
       console.error("Error calculating total time");
       return "Invalid Time Calculation";
     }
-  
+
+    
+    
+
+    //to cal total time in office 
+    if(!shouldStopTime){
+      //current time se lena hai
+      OfficetotalSeconds=new Date(`2000-01-01T${getCurrentTime()}`) - new Date(`2000-01-01T${timeSlots[0][0]}`);
+    }
+    else{
+      OfficetotalSeconds=new Date(`2000-01-01T${timeSlots[timeSlots.length-1][1]}`) - new Date(`2000-01-01T${timeSlots[0][0]}`);
+      //last slot se lena hai
+    }
+
     // Convert total milliseconds to hours, minutes, and seconds
-    const totalSeconds = Math.floor(totalMilliseconds / 1000);
+    const totalSeconds = Math.floor(OfficetotalSeconds / 1000);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
   
     // Format the total time as HH:mm:ss
-    const totalTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    const totalTime = `${String(hours)}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+
     console.log("the result object is here: ",totalTime,shouldStopTime,shouldRegularize,regularizationAddOn);
+
+
     return {totalMilliseconds,totalTime,shouldStopTime,shouldRegularize,regularizationAddOn};
 
   }
@@ -232,20 +259,17 @@ const pkj = async () => {
       if(!shouldStopTime){
         const wrapUpTime=calculateWrapUP(totalSeconds)
         DayStatus.innerHTML=`Wrapping up at <strong>${wrapUpTime}!</strong>&#128171;`
+        totalTimeVal.innerText=`${totalTime}`
         const timerInterval = setInterval(updateTimer, 1000);
 
       }
       else{
         DayStatus.innerHTML="<strong>Ta-da!</strong> Workday finished!! &#128640; &#129321; &#128131;"
+        totalTimeVal.innerText=`${totalTime}`
       }
       
     }
     
-
-
-
-
-
 
 
 
