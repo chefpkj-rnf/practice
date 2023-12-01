@@ -1,6 +1,8 @@
 const timeShow = document.querySelector("#timeShow");
 const DayStatus = document.querySelector("#DayStatus");
 const totalTimeVal = document.querySelector("#totalTimeVal");
+const effectiveTime = document.querySelector("#effectiveTime");
+const breakUsedVal = document.querySelector("#breakUsedVal");
 
 function convertTo24HoursFormat(timeSlots) {
   const convertedTimeSlots = [];
@@ -49,7 +51,6 @@ function calculateTotalTime(timeSlots) {
     let totalMilliseconds = 0;
     let regularizationAddOn=0;
     let OfficetotalSeconds=0;
-
     for(let i = 0; i < timeSlots.length; i++){
       
       
@@ -117,19 +118,33 @@ function calculateTotalTime(timeSlots) {
       //last slot se lena hai
     }
 
-    // Convert total milliseconds to hours, minutes, and seconds
+    //***Convert total milliseconds to hours, minutes, and seconds **************** */
     const totalSeconds = Math.floor(OfficetotalSeconds / 1000);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-  
     // Format the total time as HH:mm:ss
     const totalTime = `${String(hours)}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+   //*********************************************** */
 
-    console.log("the result object is here: ",totalTime,shouldStopTime,shouldRegularize,regularizationAddOn);
+
+    //***Convert total milliseconds to hours, minutes, and seconds **************** */
+    const BreakMilliSeconds=OfficetotalSeconds-totalMilliseconds;
+    const BreakTotalSeconds = Math.floor(BreakMilliSeconds / 1000);
+    const BreakHours = Math.floor(BreakTotalSeconds / 3600);
+    const BreakMinutes = Math.floor((BreakTotalSeconds % 3600) / 60);
+    const BreakSeconds = BreakTotalSeconds % 60;
+    // Format the total time as HH:mm:ss
+    const breakUsed = `${String(BreakHours)}h ${String(BreakMinutes).padStart(2, '0')}m ${String(BreakSeconds).padStart(2, '0')}s`;
+   //*********************************************** */
+
+   
 
 
-    return {totalMilliseconds,totalTime,shouldStopTime,shouldRegularize,regularizationAddOn};
+    console.log("the result object is here: ",totalTime,shouldStopTime,shouldRegularize,regularizationAddOn,breakUsed);
+    
+
+    return {OfficetotalSeconds,totalMilliseconds,totalTime,shouldStopTime,shouldRegularize,regularizationAddOn,breakUsed};
 
   }
   catch(err){
@@ -235,9 +250,10 @@ const pkj = async () => {
     async (injectionResult) => {
       //your timeSlots=injectionResult[0].result
       //now here my timeSlot is ready now i am calculating the total time from each slots 
-      const {totalMilliseconds,totalTime,shouldStopTime,shouldRegularize,regularizationAddOn}=CalculateTotalTimeFromSlotArray(injectionResult[0].result) || -1;
+      const {OfficetotalSeconds,totalMilliseconds,totalTime,shouldStopTime,shouldRegularize,regularizationAddOn,breakUsed}=CalculateTotalTimeFromSlotArray(injectionResult[0].result) || -1;
       console.log("totalMilliseconds,totalTime,shouldStopTime,shouldRegularize,regularizationAddOn",totalMilliseconds,totalTime,shouldStopTime,shouldRegularize,regularizationAddOn);
       let totalSeconds=totalMilliseconds/1000;
+      let totalSecondsOffice=OfficetotalSeconds/1000;
         const hourss = Math.floor(totalSeconds / 3600);
         const minutess = Math.floor((totalSeconds % 3600) / 60);
         const secondss = totalSeconds % 60;
@@ -252,7 +268,16 @@ const pkj = async () => {
         let seconds = totalSeconds % 60;
         const updatedTimeString = `<span style="font-size: medium;font-weight: 600; "><span style="font-size: xx-large; font-weight: 500;">${hours}</span><span style="margin-inline: 1px;">h</span><span style="margin-inline: 7px"><span style="font-size: xx-large; font-weight: 500;">${minutes<10?'0'+minutes:minutes}</span><span style="margin-inline: 1px;">m</span></span><span style="font-size: xx-large; font-weight: 500;">${seconds<10?'0'+seconds:seconds}</span><span style="margin-inline: 1px;">s</span></span>`;
         timeShow.innerHTML = updatedTimeString;
+        effectiveTime.innerText=`${String(hours)}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
         console.log("timer update kr rha hun!!")
+      }
+      function updateTotalTimer() {
+        totalSecondsOffice++; // Increment the totalSeconds
+        const shours = Math.floor(totalSecondsOffice / 3600);
+        let sminutes = Math.floor((totalSecondsOffice % 3600) / 60);
+        let sseconds = totalSecondsOffice % 60;
+        totalTimeVal.innerText=`${String(shours)}h ${String(sminutes).padStart(2, '0')}m ${String(sseconds).padStart(2, '0')}s`;
+        
       }
     
       // Call the updateTimer function every second
@@ -260,14 +285,17 @@ const pkj = async () => {
         const wrapUpTime=calculateWrapUP(totalSeconds)
         DayStatus.innerHTML=`Wrapping up at <strong>${wrapUpTime}!</strong>&#128171;`
         totalTimeVal.innerText=`${totalTime}`
+        effectiveTime.innerText=`${String(hourss)}h ${String(minutess).padStart(2, '0')}m ${String(secondss).padStart(2, '0')}s`;
+        breakUsedVal.innerText=`${breakUsed}`;
         const timerInterval = setInterval(updateTimer, 1000);
-
+        const timerIntervalOffice = setInterval(updateTotalTimer, 1000);
       }
       else{
         DayStatus.innerHTML="<strong>Ta-da!</strong> Workday finished!! &#128640; &#129321; &#128131;"
         totalTimeVal.innerText=`${totalTime}`
+        effectiveTime.innerText=`${String(hourss)}h ${String(minutess).padStart(2, '0')}m ${String(secondss).padStart(2, '0')}s`;
+        breakUsedVal.innerText=`${breakUsed}`;
       }
-      
     }
     
 
